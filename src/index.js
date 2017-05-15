@@ -1,4 +1,5 @@
 import { map, forEach, filter, take, into } from './lib'
+import { range } from './range'
 
 const users = new Map([
   [1, 'John'],
@@ -21,3 +22,9 @@ const mappedChars = chars
   ::into((iter) => new Map(iter))
 
 console.log(mappedChars)
+
+range(1, Infinity)
+  ::filter((n) => n % 3 === 0)
+  ::map((n) => n * 10)
+  ::take(12)
+  ::forEach(::console.log)
