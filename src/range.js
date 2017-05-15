@@ -1,4 +1,4 @@
-export function range(start, end, step = 1) {
+function iterator (start, end, step) {
   let current = start
 
   return {
@@ -12,9 +12,17 @@ export function range(start, end, step = 1) {
       current += step
 
       return { done: false, value }
-    },
+    }
+  }
+}
+
+export function range (start, end, step = 1) {
+  return {
+    start,
+    end,
+    step,
     [Symbol.iterator]() {
-      return this
+      return iterator(this.start, this.end, this.step)
     }
   }
 }
