@@ -1,4 +1,4 @@
-export function toIterator (value) {
+export function iterator (value) {
   if (value[Symbol.iterator]) {
     return value[Symbol.iterator]()
   }
@@ -10,34 +10,35 @@ export function toIterator (value) {
   throw new Error('value must be an iterator or iterable')
 }
 
-const makeIterator = (next) => {
+const iterable = (makeIterator) => {
   return {
-    next,
-    [Symbol.iterator]() {
-      return this
-    }
+    [Symbol.iterator]: makeIterator
   }
 }
 
 export function map (mapFn) {
-  const iterator = toIterator(this)
+  return iterable(() => {
+    const source = iterator(this)
 
-  return makeIterator(() => {
-    const { done, value } = iterator.next()
+    return {
+      next: () => {
+        const { done, value } = source.next()
 
-    if (done) {
-      return { done }
+        if (done) {
+          return { done }
+        }
+
+        return { done, value: mapFn(value, value) }
+      }
     }
-
-    return { done, value: mapFn(value, value) }
   })
 }
 
 export function forEach (callbackFn) {
-  const iterator = toIterator(this)
+  const source = iterator(this)
 
   while (true) {
-    const { done, value } = iterator.next()
+    const { done, value } = source.next()
 
     if (done) {
       return
@@ -48,38 +49,52 @@ export function forEach (callbackFn) {
 }
 
 export function filter (filterFn) {
-  const iterator = toIterator(this)
+  return iterable(() => {
+    const source = iterator(this)
 
-  return makeIterator(() => {
-    while (true) {
-      const { done, value } = iterator.next()
+    return {
+      next: () => {
+        while (true) {
+          const { done, value } = source.next()
 
-      if (done) {
-        return { done }
-      }
+          if (done) {
+            return { done }
+          }
 
-      if (filterFn(value, value)) {
-        return { done, value }
+          if (filterFn(value, value)) {
+            return { done, value }
+          }
+        }
       }
     }
   })
 }
 
 export function take (take) {
-  const iterator = toIterator(this)
-  let taken = 0
+  return iterable(() => {
+    const source = iterator(this)
+    let taken = 0
 
-  return makeIterator(() => {
-    const { done, value } = iterator.next()
+    return {
+      next: () => {
+        const { done, value } = source.next()
 
-    if (taken === take) {
-      return { done: true }
+        if (taken === take) {
+          return { done: true }
+        }
+
+        taken += 1
+
+        return { done, value }
+      }
     }
-
-    taken += 1
-
-    return { done, value }
   })
+}
+
+export function find (filterFn) {
+  return this::filter(filterFn)
+    ::take(1)
+    ::into(Array.from)[0]
 }
 
 export function into (convertFn) {

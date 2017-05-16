@@ -1,4 +1,4 @@
-import { map, forEach, filter, take, into } from './lib'
+import { map, forEach, filter, take, into, find } from './lib'
 import { range } from './range'
 
 const users = new Map([
@@ -10,6 +10,14 @@ const users = new Map([
 ])
 
 const chars = 'a😢b🍆c😆'
+
+const generator = function * (n) {
+  let value = n
+
+  while (true) {
+    yield (value *= n)
+  }
+}
 
 users
   ::map(([id, user]) => ({ id, user }))
@@ -23,8 +31,18 @@ const mappedChars = chars
 
 console.log(mappedChars)
 
-range(1, Infinity)
+const numbers = range(1, Infinity)
   ::filter((n) => n % 3 === 0)
-  ::map((n) => n * 10)
-  ::take(12)
+  ::map((n) => Math.sqrt(n))
+  ::take(3)
+
+numbers::forEach((n) => console.log(`first: ${n}`))
+numbers::forEach((n) => console.log(`second: ${n}`))
+
+generator(3)
+  ::map((n) => n / 1.5)
+  ::take(10)
   ::forEach(::console.log)
+
+
+console.log(chars::find((char) => char.length > 1))
