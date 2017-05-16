@@ -91,10 +91,23 @@ export function take (take) {
   })
 }
 
-export function find (filterFn) {
-  return this::filter(filterFn)
-    ::take(1)
-    ::into(Array.from)[0]
+export function nth (n) {
+  const source = iterator(this)
+  let current = 0
+
+  while (true) {
+    const { done, value } = source.next()
+
+    if (done) {
+      return
+    }
+
+    if (current === n) {
+      return value
+    }
+
+    current += 1
+  }
 }
 
 export function into (convertFn) {

@@ -1,4 +1,4 @@
-import { map, forEach, filter, take, into, find } from './lib'
+import { map, forEach, filter, take, into, nth } from './lib'
 import { range } from './range'
 
 const users = new Map([
@@ -44,5 +44,14 @@ generator(3)
   ::take(10)
   ::forEach(::console.log)
 
+console.log(
+  chars
+    ::filter((char) => char.length > 1)
+    ::nth(1)
+)
 
-console.log(chars::find((char) => char.length > 1))
+console.log(
+  chars
+    ::filter((char) => char.length > 1)
+    ::nth(0)
+)
